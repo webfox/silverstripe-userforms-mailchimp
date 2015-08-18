@@ -1,6 +1,8 @@
 # silverstripe-userforms-mailchimp
 Mailchimp signup field for userforms
 
+![Screenshot](images/screen.png)
+
 Add your API key to `config.yml`
 
 ```yaml

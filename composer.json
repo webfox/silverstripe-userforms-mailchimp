@@ -1,0 +1,28 @@
+{
+  "name"       : "webfox/silverstripe-userforms-mailchimp",
+  "description": "Mailchimp signup field for userforms using mailchimp v3 API",
+  "keywords"   : [
+    "webfox",
+    "silverstripe",
+    "userforms",
+    "mailchimp",
+    "mailchimpv3",
+    "newsletter",
+    "email"
+  ],
+  "type"       : "silverstripe-module",
+  "require"    : {
+    "silverstripe/cms"      : "~3.1",
+    "pacely/mailchimp-apiv3": "~1.0.3"
+  },
+  "license"    : "MIT",
+  "authors"    : [
+    {
+      "name" : "Matthew Hailwood",
+      "email": "matthew@webfox.co.nz"
+    }
+  ],
+  "extra"      : {
+    "installer-name": "userforms-mailchimp"
+  }
+}

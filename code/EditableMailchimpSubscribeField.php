@@ -6,95 +6,99 @@
  *
  * @method UserDefinedForm Parent()
  */
-class EditableMailchimpSubscribeField extends EditableFormField {
+class EditableMailchimpSubscribeField extends EditableFormField
+{
 
-	static $singular_name = 'Mailchimp Signup Field';
+    public static $singular_name = 'Mailchimp Signup Field';
 
-	static $plural_name = 'Mailchimp Signup Fields';
+    public static $plural_name = 'Mailchimp Signup Fields';
 
-	static $icon = '/silverstripe-usersforms-mailchimp-field/icons/editablemailchimpsubscribefield.png';
+    public static $icon = '/silverstripe-usersforms-mailchimp-field/icons/editablemailchimpsubscribefield.png';
 
-	static $lists;
+    public static $lists;
 
-	static $fields;
+    public static $fields;
 
-	public function __construct($record = null, $isSingleton = false, $model = null) {
-		parent::__construct($record, $isSingleton, $model);
+    public function __construct($record = null, $isSingleton = false, $model = null)
+    {
+        parent::__construct($record, $isSingleton, $model);
+    }
 
-	}
+    public function getFieldConfiguration()
+    {
+        $listID = $this->getSetting('ListID');
 
-	public function getFieldConfiguration() {
-		$listID = $this->getSetting('ListID');
+        /** @var HasManyList $otherFields */
+        $otherFields = $this->Parent()->Fields();
 
-		/** @var HasManyList $otherFields */
-		$otherFields = $this->Parent()->Fields();
+        $otherFields = $otherFields->map('Name', 'Title')->toArray();
 
-		$otherFields = $otherFields->map('Name', 'Title')->toArray();
+        $emailField     = $this->getSetting('EmailField');
+        $firstNameField = $this->getSetting('FirstNameField');
+        $lastNameField  = $this->getSetting('LastNameField');
 
-		$emailField     = $this->getSetting('EmailField');
-		$firstNameField = $this->getSetting('FirstNameField');
-		$lastNameField  = $this->getSetting('LastNameField');
+        $pre = "Fields[$this->ID][CustomSettings]";
 
-		$pre = "Fields[$this->ID][CustomSettings]";
+        $fields = new FieldList([
+            new DropdownField("{$pre}[ListID]", _t('EditableFormField.MailchimpList', 'List ID'), $this->getLists(), $listID),
+            new DropdownField("{$pre}[EmailField]", _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields, $emailField),
+            new DropdownField("{$pre}[FirstNameField]", _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields, $firstNameField),
+            new DropdownField("{$pre}[LastNameField]", _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields, $lastNameField)
+        ]);
 
-		$fields = new FieldList([
-			new DropdownField("{$pre}[ListID]", _t('EditableFormField.MailchimpList', 'List ID'), $this->getLists(), $listID),
-			new DropdownField("{$pre}[EmailField]", _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields, $emailField),
-			new DropdownField("{$pre}[FirstNameField]", _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields, $firstNameField),
-			new DropdownField("{$pre}[LastNameField]", _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields, $lastNameField)
-		]);
+        return $fields;
+    }
 
-		return $fields;
-	}
+    public function getFormField()
+    {
+        if ($this->getSetting('ListID') && $this->getSetting('EmailField') && $this->getSetting('FirstNameField') && $this->getSetting('LastNameField')) {
+            return new CheckboxField($this->Name, $this->Title);
+        }
 
-	public function getFormField() {
-		if ($this->getSetting('ListID') && $this->getSetting('EmailField') && $this->getSetting('FirstNameField') && $this->getSetting('LastNameField')) {
-			return new CheckboxField($this->Name, $this->Title);
-		}
+        return false;
+    }
 
-		return false;
-	}
+    public function getValueFromData($data)
+    {
+        $subscribe = isset($data[$this->Name]);
 
-	public function getValueFromData($data) {
+        if ($subscribe) {
+            try {
+                $mc      = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+                $request = $mc->post('lists/' . $this->getSetting('ListID') . '/members', [
+                    "email_address" => $data[$this->getSetting('EmailField')],
+                    "status"        => "subscribed",
+                    "merge_fields"  => [
+                        "FNAME" => $data[$this->getSetting('FirstNameField')],
+                        "LNAME" => $data[$this->getSetting('LastNameField')]
+                    ]
+                ]);
 
-		$subscribe = isset($data[$this->Name]);
+                return 'Subscribed';
+            } catch (Exception $e) {
+                return 'Failed (' . json_decode($e->getMessage())->detail . ')';
+            }
+        }
 
-		if ($subscribe) {
+        return "No";
+    }
 
-			try {
-				$mc      = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
-				$request = $mc->post('lists/' . $this->getSetting('ListID') . '/members', [
-					"email_address" => $data[$this->getSetting('EmailField')],
-					"status"        => "subscribed",
-					"merge_fields"  => [
-						"FNAME" => $data[$this->getSetting('FirstNameField')],
-						"LNAME" => $data[$this->getSetting('LastNameField')]
-					]
-				]);
+    public function getIcon()
+    {
+        return self::$icon;
+    }
 
-				return 'Subscribed';
-			} catch (Exception $e) {
-				return 'Failed (' . json_decode($e->getMessage())->detail . ')';
-			}
-		}
+    public function getLists()
+    {
+        if (!self::$lists) {
+            $mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
 
-		return "No";
-	}
+            /** @var \Illuminate\Support\Collection $lists */
+            $lists = $mc->request('lists', ['fields' => 'lists.id,lists.name', 'count' => 100]);
 
-	public function getIcon() {
-		return self::$icon;
-	}
+            self::$lists = $lists->lists('name', 'id')->toArray();
+        }
 
-	public function getLists() {
-		if (!self::$lists) {
-			$mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
-
-			/** @var \Illuminate\Support\Collection $lists */
-			$lists = $mc->request('lists', ['fields' => 'lists.id,lists.name', 'count' => 100]);
-
-			self::$lists = $lists->lists('name', 'id')->toArray();
-		}
-
-		return self::$lists;
-	}
+        return self::$lists;
+    }
 }

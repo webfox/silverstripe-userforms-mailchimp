@@ -12,7 +12,7 @@ class EditableMailchimpSubscribeField extends EditableFormField {
 
 	static $plural_name = 'Mailchimp Signup Fields';
 
-	static $icon = '/silverstripe-usersforms-mailchimp-field/icons/editablemailchimpsubscribefield.png';
+	static $icon = '/userforms-mailchimp/icons/editablemailchimpsubscribefield.png';
 
 	static $lists;
 

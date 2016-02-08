@@ -12,7 +12,7 @@ class EditableMailchimpSubscribeField extends EditableFormField {
 
 	static $plural_name = 'Mailchimp Signup Fields';
 
-	static $icon = '/userforms-mailchimp/icons/editablemailchimpsubscribefield.png';
+	static $icon = 'userforms-mailchimp/icons/editablemailchimpsubscribefield.png';
 
 	static $lists;
 
@@ -62,7 +62,19 @@ class EditableMailchimpSubscribeField extends EditableFormField {
 		if ($subscribe) {
 
 			try {
-				$mc      = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+				$mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+
+				// Check for proxy settings
+				if ($this->config()->get('proxy')) {
+					$mc->setProxy(
+						$this->config()->get('proxy_url'),
+						$this->config()->get('proxy_port'),
+						$this->config()->get('proxy_ssl'),
+						$this->config()->get('proxy_user'),
+						$this->config()->get('proxy_password')
+					);
+				}
+
 				$request = $mc->post('lists/' . $this->getSetting('ListID') . '/members', [
 					"email_address" => $data[$this->getSetting('EmailField')],
 					"status"        => "subscribed",
@@ -74,7 +86,7 @@ class EditableMailchimpSubscribeField extends EditableFormField {
 
 				return 'Subscribed';
 			} catch (Exception $e) {
-				return 'Failed (' . json_decode($e->getMessage())->detail . ')';
+				return 'Failed (' . json_decode($e->getMessage()) . ')';
 			}
 		}
 
@@ -88,6 +100,17 @@ class EditableMailchimpSubscribeField extends EditableFormField {
 	public function getLists() {
 		if (!self::$lists) {
 			$mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+
+			// Check for proxy settings
+			if ($this->config()->get('proxy')) {
+				$mc->setProxy(
+					$this->config()->get('proxy_url'),
+					$this->config()->get('proxy_port'),
+					$this->config()->get('proxy_ssl'),
+					$this->config()->get('proxy_user'),
+					$this->config()->get('proxy_password')
+				);
+			}
 
 			/** @var \Illuminate\Support\Collection $lists */
 			$lists = $mc->request('lists', ['fields' => 'lists.id,lists.name', 'count' => 100]);

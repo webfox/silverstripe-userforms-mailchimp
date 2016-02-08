@@ -5,11 +5,17 @@ Mailchimp signup field for userforms
 
 First install using composer `composer require webfox/silverstripe-userforms-mailchimp`
 
-Then add your API key to `config.yml`
+Then add your API key (and proxy details if required) to your `config.yml`
 
 ```yaml
 EditableMailchimpSubscribeField:
   api_key: '...'
+  proxy: false
+  proxy_url: 127.0.0.1
+  proxy_port: 8080
+  proxy_ssl: true
+  proxy_user: 'username'
+  proxy_password: 'password'
 ```
 
 Next up add the "EditableMailchimpSubscribeField" field to your form.

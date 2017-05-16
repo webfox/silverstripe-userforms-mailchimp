@@ -12,6 +12,7 @@
   ],
   "type"       : "silverstripe-module",
   "require"    : {
+    "silverstripe/userforms": "~3",
     "silverstripe/cms"      : "~3.1",
     "pacely/mailchimp-apiv3": "~1.0.3"
   },

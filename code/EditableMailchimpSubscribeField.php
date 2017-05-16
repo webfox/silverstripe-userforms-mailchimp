@@ -27,17 +27,24 @@ class EditableMailchimpSubscribeField extends EditableFormField
     /**
      * @return FieldList
      */
-    public function getFieldConfiguration()
+    public function getCMSFields()
     {
         $listID = $this->getSetting('ListID');
 
-        /** @var Form $parent */
-        $parent = $this->Parent();
+        /** @var DataList $otherFields */
+        $otherFields = EditableFormField::get()->filter(
+            array(
+                'ParentID' => $this->Parent()->ID,
+                'ID:not' => $this->ID,
+                'ClassName:not' => array(
+                    'EditableFormStep',
+                    'EditableFieldGroup',
+                    'EditableFieldGroupEnd',
+                )
+            )
+        );
 
-        /** @var HasManyList $otherFields */
-        $otherFields = $parent->Fields();
-
-        $otherFields = $otherFields->map('Name', 'Title')->toArray();
+        $otherFields = $otherFields->map('Name', 'Title');
 
         $emailField = $this->getSetting('EmailField');
         $firstNameField = $this->getSetting('FirstNameField');

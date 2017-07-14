@@ -1,7 +1,7 @@
 # silverstripe-userforms-mailchimp
 Mailchimp signup field for userforms
 
-(Screenshot is out of date)
+(Screenshot is out of date)  
 ![Screenshot](images/screen.png)
 
 First install using composer `composer require webfox/silverstripe-userforms-mailchimp`

@@ -16,7 +16,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
 {
     /** @var array */
     private static $db = array(
-        'ListID' => 'Int',
+        'ListID' => 'Varchar(100)',
         'EmailField' => 'Varchar(100)',
         'FirstNameField' => 'Varchar(100)',
         'LastNameField' => 'Varchar(100)'

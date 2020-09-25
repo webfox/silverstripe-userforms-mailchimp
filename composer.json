@@ -30,9 +30,6 @@
         }
     },
     "extra": {
-        "installer-name": "userforms-mailchimp",
-        "expose": [
-            "images"
-        ]
+        "installer-name": "userforms-mailchimp"
     }
 }

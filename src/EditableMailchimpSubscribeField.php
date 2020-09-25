@@ -39,9 +39,6 @@ class EditableMailchimpSubscribeField extends EditableFormField
     /** @var string Plural Name */
     private static $plural_name = 'Mailchimp Signup Fields';
 
-    /** @var string Field Icon */
-    private static $icon = 'webfox/userforms-mailchimp:images/editablemailchimpsubscribefield.png';
-
     private static $table_name = 'EditableMailchimpSubscribeField';
 
     /** @var array|null Lists Map */

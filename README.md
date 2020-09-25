@@ -9,7 +9,7 @@ First install using composer `composer require webfox/silverstripe-userforms-mai
 Then add your API key (and proxy details if required) to your `config.yml`
 
 ```yaml
-EditableMailchimpSubscribeField:
+WebFox\UserFormsMailchimp\EditableMailchimpSubscribeField:
   api_key: '...'
   proxy: false
   proxy_url: 127.0.0.1

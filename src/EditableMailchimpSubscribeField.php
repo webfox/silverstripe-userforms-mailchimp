@@ -42,6 +42,8 @@ class EditableMailchimpSubscribeField extends EditableFormField
     /** @var string Field Icon */
     private static $icon = 'webfox/userforms-mailchimp:images/editablemailchimpsubscribefield.png';
 
+    private static $table_name = 'EditableMailchimpSubscribeField';
+
     /** @var array|null Lists Map */
     private static $lists;
 

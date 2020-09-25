@@ -1,0 +1,6 @@
+---
+Name: userforms-mailchimp-legacy
+---
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    EditableMailchimpSubscribeField: WebFox\UserFormsMailchimp\EditableMailchimpSubscribeField

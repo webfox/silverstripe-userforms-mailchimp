@@ -30,7 +30,7 @@
         }
     },
     "extra": {
-        "installer-name": "silverstripe-userforms-mailchimp",
+        "installer-name": "userforms-mailchimp",
         "expose": [
             "images"
         ]

@@ -14,7 +14,7 @@
     "require": {
         "php": ">=5.6",
         "silverstripe/cms": "^4.0",
-        "silverstripe/userforms": "5.0",
+        "silverstripe/userforms": "^5.0",
         "pacely/mailchimp-apiv3": "~1.0.6"
     },
     "license": "MIT",

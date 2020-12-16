@@ -130,7 +130,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
             ]);
 
             return 'Subscribed';
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 'Failed (' . json_decode($e->getMessage())->title . ')';
         }
     }

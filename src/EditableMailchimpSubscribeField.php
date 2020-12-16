@@ -95,7 +95,11 @@ class EditableMailchimpSubscribeField extends EditableFormField
      */
     public function getFormField()
     {
-        return CheckboxField::create($this->Name, $this->Title);
+        if ($this->ListID && $this->EmailField) {
+            return CheckboxField::create($this->Name, $this->Title);
+        }
+
+        return false;
     }
 
     /**
@@ -106,7 +110,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
     {
         $subscribe = isset($data[$this->Name]);
 
-        if (!$subscribe) {
+        if (!$subscribe || !$this->ListID) {
             return 'Unable to subscribe';
         }
 

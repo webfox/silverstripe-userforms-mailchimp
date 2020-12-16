@@ -107,7 +107,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
         }
 
         try {
-            $mailchimp = new Mailchimp($this->config()->get('api_key'));
+            $mailchimp = new MailChimp($this->config()->get('api_key'));
 
             // Check for proxy settings
             if ($this->config()->get('proxy')) {
@@ -153,7 +153,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
     public function getLists()
     {
         if (!self::$lists) {
-            $mailchimp = new Mailchimp($this->config()->get('api_key'));
+            $mailchimp = new MailChimp($this->config()->get('api_key'));
 
             // Check for proxy settings
             if ($this->config()->get('proxy')) {

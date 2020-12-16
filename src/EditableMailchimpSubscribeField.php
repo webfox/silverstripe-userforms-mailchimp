@@ -75,10 +75,14 @@ class EditableMailchimpSubscribeField extends EditableFormField
             $fields->addFieldsToTab(
                 'Root.Mailchimp',
                 [
-                    DropdownField::create('ListID', _t('EditableFormField.MailchimpList', 'List ID'), $lists),
-                    DropdownField::create('EmailField', _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields),
-                    DropdownField::create('FirstNameField', _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields),
-                    DropdownField::create('LastNameField', _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields),
+                    DropdownField::create('ListID', _t('EditableFormField.MailchimpList', 'List ID'), $lists)
+                        ->setEmptyString(''),
+                    DropdownField::create('EmailField', _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields)
+                        ->setEmptyString(''),
+                    DropdownField::create('FirstNameField', _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields)
+                        ->setEmptyString(''),
+                    DropdownField::create('LastNameField', _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields)
+                        ->setEmptyString(''),
                 ]
             );
         });

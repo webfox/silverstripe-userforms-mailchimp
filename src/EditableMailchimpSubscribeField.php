@@ -2,10 +2,12 @@
 
 namespace WebFox\UserFormsMailchimp;
 
+use DrewM\MailChimp\MailChimp;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\UserForms\Model\EditableFormField;
 use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup;
 use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd;
@@ -70,24 +72,15 @@ class EditableMailchimpSubscribeField extends EditableFormField
                 ]
             )->map('Name', 'Title');
 
-            if (class_exists('Mailchimp\Mailchimp')) {
-                $fields->addFieldsToTab(
-                    'Root.Mailchimp',
-                    [
-                        DropdownField::create('ListID', _t('EditableFormField.MailchimpList', 'List ID'), $lists),
-                        DropdownField::create('EmailField', _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields),
-                        DropdownField::create('FirstNameField', _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields),
-                        DropdownField::create('LastNameField', _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields),
-                    ]
-                );
-            } else {
-                $fields->addFieldsToTab(
-                    'Root.Mailchimp',
-                    [
-                        LiteralField::create('DependencyMissing', '<div class="message bad">The dependency <em>pacely/mailchimp-apiv3</em> is missing. Please reinstall this module via composer'),
-                    ]
-                );
-            }
+            $fields->addFieldsToTab(
+                'Root.Mailchimp',
+                [
+                    DropdownField::create('ListID', _t('EditableFormField.MailchimpList', 'List ID'), $lists),
+                    DropdownField::create('EmailField', _t('EditableFormField.MailchimpEmailField', 'Email Field'), $otherFields),
+                    DropdownField::create('FirstNameField', _t('EditableFormField.MailchimpFirstNameField', 'First Name Field'), $otherFields),
+                    DropdownField::create('LastNameField', _t('EditableFormField.MailchimpLastNameField', 'Last Name Field'), $otherFields),
+                ]
+            );
         });
 
         return parent::getCMSFields();
@@ -98,11 +91,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
      */
     public function getFormField()
     {
-        if (class_exists('Mailchimp\Mailchimp') && $this->ListID && $this->EmailField && $this->FirstNameField && $this->LastNameField) {
-            return CheckboxField::create($this->Name, $this->Title);
-        }
-
-        return false;
+        return CheckboxField::create($this->Name, $this->Title);
     }
 
     /**
@@ -113,16 +102,16 @@ class EditableMailchimpSubscribeField extends EditableFormField
     {
         $subscribe = isset($data[$this->Name]);
 
-        if (!$subscribe || !class_exists('Mailchimp\Mailchimp')) {
+        if (!$subscribe) {
             return 'Unable to subscribe';
         }
 
         try {
-            $mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+            $mailchimp = new Mailchimp($this->config()->get('api_key'));
 
             // Check for proxy settings
             if ($this->config()->get('proxy')) {
-                $mc->setProxy(
+                $mailchimp->setProxy(
                     $this->config()->get('proxy_url'),
                     (int) $this->config()->get('proxy_port'),
                     $this->config()->get('proxy_ssl'),
@@ -131,7 +120,7 @@ class EditableMailchimpSubscribeField extends EditableFormField
                 );
             }
 
-            $mc->post('lists/' . $this->ListID . '/members', [
+            $mailchimp->post('lists/' . $this->ListID . '/members', [
                 'email_address' => $data[$this->EmailField],
                 'status' => 'subscribed',
                 'merge_fields' => [
@@ -163,16 +152,12 @@ class EditableMailchimpSubscribeField extends EditableFormField
      */
     public function getLists()
     {
-        if (!class_exists('Mailchimp\Mailchimp')) {
-            return [];
-        }
-
         if (!self::$lists) {
-            $mc = new \Mailchimp\Mailchimp($this->config()->get('api_key'));
+            $mailchimp = new Mailchimp($this->config()->get('api_key'));
 
             // Check for proxy settings
             if ($this->config()->get('proxy')) {
-                $mc->setProxy(
+                $mailchimp->setProxy(
                     $this->config()->get('proxy_url'),
                     (int) $this->config()->get('proxy_port'),
                     $this->config()->get('proxy_ssl'),
@@ -181,10 +166,11 @@ class EditableMailchimpSubscribeField extends EditableFormField
                 );
             }
 
-            /** @var \Illuminate\Support\Collection $lists */
-            $lists = $mc->request('lists', ['fields' => 'lists.id,lists.name', 'count' => 100]);
+            $lists = $mailchimp->get('lists', ['fields' => 'lists.id,lists.name', 'count' => 100]);
 
-            self::$lists = $lists->pluck('name', 'id')->toArray();
+            $lists = new ArrayList($lists['lists']);
+
+            self::$lists = $lists->map('id', 'name')->toArray();
         }
 
         return self::$lists;
